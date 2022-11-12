@@ -13,6 +13,12 @@ const productSchema = new mongoose.Schema({
         maxLength: [100, 'Product name cannot exceed 5 characters'],
         default: 0.0
     },
+    sale_price: {
+        type: Number,
+        required: [true, 'Please enter product price'],
+        maxLength: [100, 'Product name cannot exceed 5 characters'],
+        default: 0.0
+    },
     description: {
         type: String,
         required: [true, 'Please enter product description']
@@ -21,7 +27,7 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    images: [
+    sm_pictures: [
         {
             public_id: {
                 type: String,
@@ -33,33 +39,24 @@ const productSchema = new mongoose.Schema({
             }
         }
     ],
-    category: {
-        type: String,
-        required: [true, 'Please select category for this product'],
-        enum: {
-            values: [
-                'Electronics',
-                'Cameras',
-                'Laptops',
-                'Accessories',
-                'Headphones',
-                'Food',
-                'Books',
-                'Clothes/Shoes',
-                'Beauty/Health',
-                'Sports',
-                'Outdoor',
-                'Home'
-            ],
-            message: 'Please select correct category for product'
+    category: [
+        {
+            name: {
+                type: String,
+                required: [true, 'Please select category name for this product']            
+            },
+            slug: {
+                type: String,
+                required: [true, 'Please select category slug for this product']
+            }
         }
-    },
+    ],
     seller: {
         type: String,
         required: [true, 'Please enter product seller']
     },
     stock: {
-        type: String,
+        type: Number,
         required: [true, 'Please enter product stock'],
         maxLength: [5, 'Product stock cannot exceed 5 characters'],
         default: 0
@@ -89,10 +86,33 @@ const productSchema = new mongoose.Schema({
             }
         }
     ],
+    variants: [
+        {
+            color: {
+                type: String,
+                required: true
+            },
+            price: {
+                type: Number,
+                required: true
+            }
+        }
+    ],
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
-        required: true
+        required: false
+    },
+    slug: {
+        type: String
+    },
+    new: {
+        type: Boolean,
+        default: false
+    },
+    top: {
+        type: Boolean,
+        default: false
     },
     createdAt: {
         type: Date,
