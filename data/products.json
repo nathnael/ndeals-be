@@ -8,6 +8,10 @@
             {
                 "name": "Electronics",
                 "slug": "electronics"
+            },
+            {
+                "name": "USB-Drive",
+                "slug": "usb-drive"
             }
         ],
         "seller" : "Ebay",
@@ -46,6 +50,10 @@
             {
                 "name": "Electronics",
                 "slug": "electronics"
+            },
+            {
+                "name": "Monitors",
+                "slug": "monitors"
             }
         ],
         "seller" : "Amazon",
@@ -84,6 +92,10 @@
             {
                 "name": "Electronics",
                 "slug": "electronics"
+            },
+            {
+                "name": "TV",
+                "slug": "tv"
             }
         ],
         "seller" : "Amazon",
@@ -122,6 +134,10 @@
             {
                 "name": "Headphones",
                 "slug": "headphones"
+            },
+            {
+                "name": "Bluetooth",
+                "slug": "bluetooth"
             }
         ],
         "seller" : "Amazon",
@@ -160,6 +176,10 @@
             {
                 "name": "Electronics",
                 "slug": "electronics"
+            },
+            {
+                "name": "AirPods",
+                "slug": "airpods"
             }
         ],        
         "seller" : "Amazon",
@@ -198,6 +218,10 @@
             {
                 "name": "Accessories",
                 "slug": "accessories"
+            },
+            {
+                "name": "Microphone",
+                "slug": "microphone"
             }
         ],
         "seller" : "Amazon",
@@ -236,6 +260,10 @@
             {
                 "name": "Cameras",
                 "slug": "cameras"
+            },
+            {
+                "name": "Nikon",
+                "slug": "nikon"
             }
         ],
         "seller" : "Amazon",
@@ -274,6 +302,10 @@
             {
                 "name": "Laptops",
                 "slug": "laptops"
+            },
+            {
+                "name": "Apple",
+                "slug": "apple"
             }
         ],
         "seller" : "Amazon",
@@ -312,6 +344,10 @@
             {
                 "name": "Food",
                 "slug": "food"
+            },
+            {
+                "name": "Apple",
+                "slug": "apple"
             }
         ],
         "seller" : "Kauffman's Fruit Farm & Market",

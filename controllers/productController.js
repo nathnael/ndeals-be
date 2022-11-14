@@ -42,9 +42,15 @@ exports.getSingleProduct = catchAsyncErrors (async (req, res, next) => {
         return next(new ErrorHandler('Product not found', 404));
     }
 
+    // console.log("**************** Product: " + product.category.map(cat => cat.name));
+
+    const query = { 'category.name':  { $in: product.category.map(cat => cat.name) } };
+    const relatedProducts = await Product.find(query);
+
     res.status(200).json({
         success: true,
-        product
+        product,
+        relatedProducts
     })
 });
 
