@@ -12,31 +12,40 @@ class APIFeatures {
             }
         } : {};
 
-        console.log(keyword);
+        // console.log(keyword);
         this.query = this.query.find({ ...keyword });
         return this;
     }
 
     filter() {
-        const queryCopy = { ...this.queryStr };
+        try {
+            const queryCopy = { ...this.queryStr };
 
-        //Removing fields from the query
-        const removeFields = ['keyword', 'limit', 'page'];
-        removeFields.forEach(el => delete queryCopy[el]);
+            //Removing fields from the query
+            const removeFields = ['keyword', 'limit', 'page', 'perPage'];
+            removeFields.forEach(el => delete queryCopy[el]);        
 
-        // Advanced filter for price, ratings, etc.
-        let queryStr = JSON.stringify(queryCopy);
-        queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
+            // Advanced filter for price, ratings, etc.
+            let queryStr = JSON.stringify(queryCopy);
+            queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
+            queryStr = queryStr.replace(/\b(category)\b/g, match => `${match}.name`);
 
-        this.query = this.query.find(JSON.parse(queryStr));
-        return this;
+            console.log(`queryStr: ${queryStr}`);
+
+            this.query = this.query.find(JSON.parse(queryStr));
+            
+            return this;
+        } catch(e) {
+            console.log(`Error: ${e}`);
+        }
     }
 
-    pagination(resPerPage) {
+    pagination() {
         const currentPage = Number(this.queryStr.page) || 1;
-        const skip = resPerPage * (currentPage - 1 );
+        const perPage = Number(this.queryStr.perPage) || 12;
+        const skip = perPage * (currentPage - 1 );
 
-        this.query = this.query.limit(resPerPage).skip(skip);
+        this.query = this.query.limit(perPage).skip(skip);
         return this;
     }
 }

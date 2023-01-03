@@ -5,7 +5,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors.js');
 const APIFeatures = require('../utils/apiFeatures');
 
 // Create new product      =>      /api/v1/product/new
-exports.newProduct = catchAsyncErrors (async (req, res, next) => { 
+exports.newProduct = catchAsyncErrors (async (req, res, next) => {
     req.body.user = req.user.id;   
     const product = await Product.create(req.body);
     res.status(201).json({
@@ -18,15 +18,20 @@ exports.newProduct = catchAsyncErrors (async (req, res, next) => {
 // Get all products   =>  /api/v1/products?keyword=apple
 exports.getProducts = catchAsyncErrors (async (req, res, next) => {
 
-    const resPerPage = 8;
-    const productsCount = await Product.countDocuments();
+    // const resPerPage = 8;
+    const apiFeaturesCount = new APIFeatures(Product.find(), req.query)
+                            .search()
+                            .filter();
+    const productsTotal = await apiFeaturesCount.query;
+
+    const productsCount = productsTotal.length;
 
     const apiFeatures = new APIFeatures(Product.find(), req.query)
                             .search()
                             .filter()
-                            .pagination(resPerPage);
+                            .pagination();
     const products = await apiFeatures.query;
-
+    
     res.status(200).json({
         success: true,
         productsCount,
@@ -163,5 +168,78 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200).json({
         success: true
+    });
+});
+
+// Select and Return unique categories with their counts
+exports.getUniqueCategories = catchAsyncErrors(async (req, res, next) => {
+    // const uniqueCategories = await Product.find().distinct("category.name");
+    const uniqueCategories = await Product.aggregate([
+        {
+            $unwind: "$category" // unwind the categories array
+        },
+        {
+            $group: {
+                _id: "$category.name", // group by the category field
+                count: { $sum: 1 } // count the number of instances
+            }
+        },
+        {
+            $project: {
+                _id: 0, // exclude the _id field from the result
+                category: "$_id", // rename the _id field to "category"
+                count: 1 // include the count field in the result
+            }
+        },
+        {
+            $sort: {
+                count: -1,
+                category: 1               
+            }
+        },
+        {
+            $limit: 10
+        }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        categories: uniqueCategories
+    });
+});
+
+// Select and Return unique categories with their counts
+exports.getUniqueSizes = catchAsyncErrors(async (req, res, next) => {
+    const uniqueSizes = await Product.aggregate([
+        {
+            $unwind: "$variants" // unwind the variants array
+        },
+        {
+            $group: {
+                _id: "$variants.size", // group by the variants field
+                count: { $sum: 1 } // count the number of instances
+            }
+        },
+        {
+            $project: {
+                _id: 0, // exclude the _id field from the result
+                size: "$_id", // rename the _id field to "variants.size"
+                count: 1 // include the count field in the result
+            }
+        },
+        {
+            $sort: {
+                count: -1,
+                size: 1               
+            }
+        },
+        {
+            $limit: 6
+        }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        sizes: uniqueSizes
     });
 });

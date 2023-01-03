@@ -9,7 +9,9 @@ const {
     deleteProduct,
     createProductReview,
     getProductReviews,
-    deleteReview
+    deleteReview,
+    getUniqueCategories,
+    getUniqueSizes
 } = require('../controllers/productController.js');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -17,6 +19,10 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 router.route('/products').get(getProducts);
 
 router.route('/product/:id').get(getSingleProduct);
+
+router.route('/getUniqueCategories').get(getUniqueCategories);
+
+router.route('/getUniqueSizes').get(getUniqueSizes);
 
 router.route('/admin/product/new').post(isAuthenticatedUser, authorizeRoles("admin"), newProduct);
 
