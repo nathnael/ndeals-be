@@ -48,11 +48,12 @@ exports.getProducts = catchAsyncErrors(function _callee2(req, res, next) {
         case 3:
           productsTotal = _context2.sent;
           productsCount = productsTotal.length;
+          console.log("productsCount: ".concat(productsCount));
           apiFeatures = new APIFeatures(Product.find(), req.query).search().filter().pagination();
-          _context2.next = 8;
+          _context2.next = 9;
           return regeneratorRuntime.awrap(apiFeatures.query);
 
-        case 8:
+        case 9:
           products = _context2.sent;
           res.status(200).json({
             success: true,
@@ -60,7 +61,7 @@ exports.getProducts = catchAsyncErrors(function _callee2(req, res, next) {
             products: products
           });
 
-        case 10:
+        case 11:
         case "end":
           return _context2.stop();
       }

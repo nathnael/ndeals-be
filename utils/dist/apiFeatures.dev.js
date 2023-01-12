@@ -48,13 +48,36 @@ function () {
         }); // Advanced filter for price, ratings, etc.
 
         var queryStr = JSON.stringify(queryCopy);
+        queryStr = JSON.parse(queryStr);
+
+        if (queryStr && queryStr !== null && queryStr !== '') {
+          // console.log(`queryStr: ${queryStr}`); 
+          if (queryStr.size && queryStr.size !== null && queryStr.size !== '') {
+            // console.log(`queryStr.size: ${queryStr.size}`);
+            if (queryStr.size["in"] && queryStr.size["in"] !== null && queryStr.size["in"] !== '') {
+              // console.log(`queryStr.size.in: ${queryStr.size.in}`); 
+              queryStr.size["in"] = queryStr.size["in"].split(',');
+            } else {
+              delete queryStr.size;
+            }
+          }
+        } // Serializing the modified query back to a string
+
+
+        queryStr = JSON.stringify(queryStr);
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, function (match) {
           return "$".concat(match);
         });
         queryStr = queryStr.replace(/\b(category)\b/g, function (match) {
           return "".concat(match, ".name");
         });
-        console.log("queryStr: ".concat(queryStr));
+        queryStr = queryStr.replace(/\b(size)\b/g, function (match) {
+          return "variants.".concat(match);
+        });
+        queryStr = queryStr.replace(/\b(in)\b/g, function (match) {
+          return "$".concat(match);
+        }); // console.log(`queryStrFinal: ${queryStr}`); 
+
         this.query = this.query.find(JSON.parse(queryStr));
         return this;
       } catch (e) {

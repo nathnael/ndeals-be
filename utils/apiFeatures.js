@@ -27,10 +27,30 @@ class APIFeatures {
 
             // Advanced filter for price, ratings, etc.
             let queryStr = JSON.stringify(queryCopy);
+
+            queryStr = JSON.parse(queryStr);
+            if (queryStr && queryStr!==null && queryStr!=='') {
+                // console.log(`queryStr: ${queryStr}`); 
+                if (queryStr.size && queryStr.size!==null && queryStr.size!=='') {
+                    // console.log(`queryStr.size: ${queryStr.size}`);
+                    if (queryStr.size.in && queryStr.size.in!==null && queryStr.size.in!=='') {
+                        // console.log(`queryStr.size.in: ${queryStr.size.in}`); 
+                        queryStr.size.in = queryStr.size.in.split(',');
+                    }
+                    else {
+                        delete queryStr.size;      
+                    }
+                }
+            }
+            // Serializing the modified query back to a string
+            queryStr = JSON.stringify(queryStr);
+
             queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`);
             queryStr = queryStr.replace(/\b(category)\b/g, match => `${match}.name`);
-
-            console.log(`queryStr: ${queryStr}`);
+            queryStr = queryStr.replace(/\b(size)\b/g, match => `variants.${match}`);
+            queryStr = queryStr.replace(/\b(in)\b/g, match => `$${match}`);
+            
+            // console.log(`queryStrFinal: ${queryStr}`); 
 
             this.query = this.query.find(JSON.parse(queryStr));
             
