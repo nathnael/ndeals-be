@@ -11,7 +11,10 @@ const {
     getProductReviews,
     deleteReview,
     getUniqueCategories,
-    getUniqueSizes
+    getUniqueSizes,
+    getUniqueColors,
+    getUniqueBrands,
+    getPriceRange
 } = require('../controllers/productController.js');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -23,6 +26,12 @@ router.route('/product/:id').get(getSingleProduct);
 router.route('/getUniqueCategories').get(getUniqueCategories);
 
 router.route('/getUniqueSizes').get(getUniqueSizes);
+
+router.route('/getUniqueColors').get(getUniqueColors);
+
+router.route('/getUniqueBrands').get(getUniqueBrands);
+
+router.route('/getPriceRange').get(getPriceRange);
 
 router.route('/admin/product/new').post(isAuthenticatedUser, authorizeRoles("admin"), newProduct);
 

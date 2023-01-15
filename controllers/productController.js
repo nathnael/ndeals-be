@@ -26,10 +26,10 @@ exports.getProducts = catchAsyncErrors (async (req, res, next) => {
 
     const productsCount = productsTotal.length;
 
-    console.log(`productsCount: ${productsCount}`)
+    // console.log(`productsCount: ${productsCount}`)
 
 
-    const apiFeatures = new APIFeatures(Product.find(), req.query)
+    const apiFeatures = new APIFeatures(Product.find(), req.query, productsCount)
                             .search()
                             .filter()
                             .pagination();
@@ -212,7 +212,7 @@ exports.getUniqueCategories = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-// Select and Return unique categories with their counts
+// Select and Return unique sizes with their counts
 exports.getUniqueSizes = catchAsyncErrors(async (req, res, next) => {
     const uniqueSizes = await Product.aggregate([
         {
@@ -245,5 +245,93 @@ exports.getUniqueSizes = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
         success: true,
         sizes: uniqueSizes
+    });
+});
+
+// Select and Return unique colors with their counts
+exports.getUniqueColors = catchAsyncErrors(async (req, res, next) => {
+    const uniqueColors = await Product.aggregate([
+        {
+            $unwind: "$variants" // unwind the variants array
+        },
+        {
+            $group: {
+                _id: { color: "$variants.color", colorName: "$variants.colorName"}, // group by the variants field
+                count: { $sum: 1 } // count the number of instances
+            }
+        },
+        {
+            $project: {
+                _id: 0, // exclude the _id field from the result
+                color: "$_id.color", // rename the _id field to "variants.color"
+                colorName: "$_id.colorName", // rename the _id field to "variants.colorName"
+                count: 1 // include the count field in the result
+            }
+        },
+        {
+            $sort: {
+                count: -1,
+                colorName: 1               
+            }
+        },
+        {
+            $limit: 10
+        }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        colors: uniqueColors
+    });
+});
+
+// Select and Return unique brands with their counts
+exports.getUniqueBrands = catchAsyncErrors(async (req, res, next) => {
+    const uniqueBrands = await Product.aggregate([
+        {
+            $unwind: "$variants" // unwind the variants array
+        },
+        {
+            $group: {
+                _id: "$variants.brand", // group by the variants field
+                count: { $sum: 1 } // count the number of instances
+            }
+        },
+        {
+            $project: {
+                _id: 0, // exclude the _id field from the result
+                brand: "$_id", // rename the _id field to "variants.brand"
+                count: 1 // include the count field in the result
+            }
+        },
+        {
+            $sort: {
+                count: -1,
+                brand: 1               
+            }
+        },
+        {
+            $limit: 6
+        }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        brands: uniqueBrands
+    });
+});
+
+
+// Select and Return unique brands with their counts
+exports.getPriceRange = catchAsyncErrors(async (req, res, next) => {
+
+    const minPrice = await Product.find({}).sort({ price: 1 }).limit(1).then(product => product[0].price);
+
+    const maxPrice = await Product.find({}).sort({ price: -1 }).limit(1).then(product => product[0].price);
+    
+    res.status(200).json({
+        success: true,
+        minPrice,
+        maxPrice
     });
 });

@@ -15,11 +15,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var APIFeatures =
 /*#__PURE__*/
 function () {
-  function APIFeatures(query, queryString) {
+  function APIFeatures(query, queryString, productsCount) {
     _classCallCheck(this, APIFeatures);
 
     this.query = query;
     this.queryStr = queryString;
+    this.productsCount = productsCount;
   }
 
   _createClass(APIFeatures, [{
@@ -51,14 +52,31 @@ function () {
         queryStr = JSON.parse(queryStr);
 
         if (queryStr && queryStr !== null && queryStr !== '') {
-          // console.log(`queryStr: ${queryStr}`); 
+          // console.log(`queryStr: ${JSON.stringify(queryStr)}`); 
           if (queryStr.size && queryStr.size !== null && queryStr.size !== '') {
-            // console.log(`queryStr.size: ${queryStr.size}`);
             if (queryStr.size["in"] && queryStr.size["in"] !== null && queryStr.size["in"] !== '') {
-              // console.log(`queryStr.size.in: ${queryStr.size.in}`); 
               queryStr.size["in"] = queryStr.size["in"].split(',');
             } else {
               delete queryStr.size;
+            }
+          }
+
+          if (queryStr.color && queryStr.color !== null && queryStr.color !== '') {
+            if (queryStr.color["in"] && queryStr.color["in"] !== null && queryStr.color["in"] !== '') {
+              queryStr.color["in"] = queryStr.color["in"].split(',');
+              queryStr.color["in"] = queryStr.color["in"].map(function (c) {
+                return "#".concat(c);
+              });
+            } else {
+              delete queryStr.color;
+            }
+          }
+
+          if (queryStr.brand && queryStr.brand !== null && queryStr.brand !== '') {
+            if (queryStr.brand["in"] && queryStr.brand["in"] !== null && queryStr.brand["in"] !== '') {
+              queryStr.brand["in"] = queryStr.brand["in"].split(',');
+            } else {
+              delete queryStr.brand;
             }
           }
         } // Serializing the modified query back to a string
@@ -72,6 +90,12 @@ function () {
           return "".concat(match, ".name");
         });
         queryStr = queryStr.replace(/\b(size)\b/g, function (match) {
+          return "variants.".concat(match);
+        });
+        queryStr = queryStr.replace(/\b(color)\b/g, function (match) {
+          return "variants.".concat(match);
+        });
+        queryStr = queryStr.replace(/\b(brand)\b/g, function (match) {
           return "variants.".concat(match);
         });
         queryStr = queryStr.replace(/\b(in)\b/g, function (match) {
@@ -90,6 +114,10 @@ function () {
       var currentPage = Number(this.queryStr.page) || 1;
       var perPage = Number(this.queryStr.perPage) || 12;
       var skip = perPage * (currentPage - 1);
+      skip = this.productsCount && skip >= this.productsCount ? 0 : skip;
+      console.log("currentPage: ".concat(currentPage));
+      console.log("perPage: ".concat(perPage));
+      console.log("skip: ".concat(skip));
       this.query = this.query.limit(perPage).skip(skip);
       return this;
     }

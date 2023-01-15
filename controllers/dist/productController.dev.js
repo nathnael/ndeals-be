@@ -47,13 +47,13 @@ exports.getProducts = catchAsyncErrors(function _callee2(req, res, next) {
 
         case 3:
           productsTotal = _context2.sent;
-          productsCount = productsTotal.length;
-          console.log("productsCount: ".concat(productsCount));
-          apiFeatures = new APIFeatures(Product.find(), req.query).search().filter().pagination();
-          _context2.next = 9;
+          productsCount = productsTotal.length; // console.log(`productsCount: ${productsCount}`)
+
+          apiFeatures = new APIFeatures(Product.find(), req.query, productsCount).search().filter().pagination();
+          _context2.next = 8;
           return regeneratorRuntime.awrap(apiFeatures.query);
 
-        case 9:
+        case 8:
           products = _context2.sent;
           res.status(200).json({
             success: true,
@@ -61,7 +61,7 @@ exports.getProducts = catchAsyncErrors(function _callee2(req, res, next) {
             products: products
           });
 
-        case 11:
+        case 10:
         case "end":
           return _context2.stop();
       }
@@ -367,7 +367,7 @@ exports.getUniqueCategories = catchAsyncErrors(function _callee9(req, res, next)
       }
     }
   });
-}); // Select and Return unique categories with their counts
+}); // Select and Return unique sizes with their counts
 
 exports.getUniqueSizes = catchAsyncErrors(function _callee10(req, res, next) {
   var uniqueSizes;
@@ -416,6 +416,153 @@ exports.getUniqueSizes = catchAsyncErrors(function _callee10(req, res, next) {
         case 4:
         case "end":
           return _context10.stop();
+      }
+    }
+  });
+}); // Select and Return unique colors with their counts
+
+exports.getUniqueColors = catchAsyncErrors(function _callee11(req, res, next) {
+  var uniqueColors;
+  return regeneratorRuntime.async(function _callee11$(_context11) {
+    while (1) {
+      switch (_context11.prev = _context11.next) {
+        case 0:
+          _context11.next = 2;
+          return regeneratorRuntime.awrap(Product.aggregate([{
+            $unwind: "$variants" // unwind the variants array
+
+          }, {
+            $group: {
+              _id: {
+                color: "$variants.color",
+                colorName: "$variants.colorName"
+              },
+              // group by the variants field
+              count: {
+                $sum: 1
+              } // count the number of instances
+
+            }
+          }, {
+            $project: {
+              _id: 0,
+              // exclude the _id field from the result
+              color: "$_id.color",
+              // rename the _id field to "variants.color"
+              colorName: "$_id.colorName",
+              // rename the _id field to "variants.colorName"
+              count: 1 // include the count field in the result
+
+            }
+          }, {
+            $sort: {
+              count: -1,
+              colorName: 1
+            }
+          }, {
+            $limit: 10
+          }]));
+
+        case 2:
+          uniqueColors = _context11.sent;
+          res.status(200).json({
+            success: true,
+            colors: uniqueColors
+          });
+
+        case 4:
+        case "end":
+          return _context11.stop();
+      }
+    }
+  });
+}); // Select and Return unique brands with their counts
+
+exports.getUniqueBrands = catchAsyncErrors(function _callee12(req, res, next) {
+  var uniqueBrands;
+  return regeneratorRuntime.async(function _callee12$(_context12) {
+    while (1) {
+      switch (_context12.prev = _context12.next) {
+        case 0:
+          _context12.next = 2;
+          return regeneratorRuntime.awrap(Product.aggregate([{
+            $unwind: "$variants" // unwind the variants array
+
+          }, {
+            $group: {
+              _id: "$variants.brand",
+              // group by the variants field
+              count: {
+                $sum: 1
+              } // count the number of instances
+
+            }
+          }, {
+            $project: {
+              _id: 0,
+              // exclude the _id field from the result
+              brand: "$_id",
+              // rename the _id field to "variants.brand"
+              count: 1 // include the count field in the result
+
+            }
+          }, {
+            $sort: {
+              count: -1,
+              brand: 1
+            }
+          }, {
+            $limit: 6
+          }]));
+
+        case 2:
+          uniqueBrands = _context12.sent;
+          res.status(200).json({
+            success: true,
+            brands: uniqueBrands
+          });
+
+        case 4:
+        case "end":
+          return _context12.stop();
+      }
+    }
+  });
+}); // Select and Return unique brands with their counts
+
+exports.getPriceRange = catchAsyncErrors(function _callee13(req, res, next) {
+  var minPrice, maxPrice;
+  return regeneratorRuntime.async(function _callee13$(_context13) {
+    while (1) {
+      switch (_context13.prev = _context13.next) {
+        case 0:
+          _context13.next = 2;
+          return regeneratorRuntime.awrap(Product.find({}).sort({
+            price: 1
+          }).limit(1).then(function (product) {
+            return product[0].price;
+          }));
+
+        case 2:
+          minPrice = _context13.sent;
+          _context13.next = 5;
+          return regeneratorRuntime.awrap(Product.find({}).sort({
+            price: -1
+          }).limit(1).then(function (product) {
+            return product[0].price;
+          }));
+
+        case 5:
+          maxPrice = _context13.sent;
+          res.status(200).json({
+            success: true,
+            minPrice: minPrice,
+            maxPrice: maxPrice
+          });
+
+        case 7:
+        case "end":
+          return _context13.stop();
       }
     }
   });
