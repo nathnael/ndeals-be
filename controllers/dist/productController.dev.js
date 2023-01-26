@@ -70,7 +70,7 @@ exports.getProducts = catchAsyncErrors(function _callee2(req, res, next) {
 }); // Get single product details   =>   /api/v1/product/:id
 
 exports.getSingleProduct = catchAsyncErrors(function _callee3(req, res, next) {
-  var product, query, relatedProducts;
+  var productDetails, query, relatedProducts;
   return regeneratorRuntime.async(function _callee3$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
@@ -79,9 +79,9 @@ exports.getSingleProduct = catchAsyncErrors(function _callee3(req, res, next) {
           return regeneratorRuntime.awrap(Product.findById(req.params.id));
 
         case 2:
-          product = _context3.sent;
+          productDetails = _context3.sent;
 
-          if (product) {
+          if (productDetails) {
             _context3.next = 5;
             break;
           }
@@ -92,7 +92,7 @@ exports.getSingleProduct = catchAsyncErrors(function _callee3(req, res, next) {
           // console.log("**************** Product: " + product.category.map(cat => cat.name));
           query = {
             'category.name': {
-              $in: product.category.map(function (cat) {
+              $in: productDetails.category.map(function (cat) {
                 return cat.name;
               })
             }
@@ -104,7 +104,7 @@ exports.getSingleProduct = catchAsyncErrors(function _callee3(req, res, next) {
           relatedProducts = _context3.sent;
           res.status(200).json({
             success: true,
-            product: product,
+            productDetails: productDetails,
             relatedProducts: relatedProducts
           });
 

@@ -84,9 +84,9 @@ class APIFeatures {
         let skip = perPage * (currentPage - 1 );
         skip = (this.productsCount && skip >= this.productsCount) ? 0 : skip;
 
-        console.log(`currentPage: ${currentPage}`); 
-        console.log(`perPage: ${perPage}`); 
-        console.log(`skip: ${skip}`); 
+        // console.log(`currentPage: ${currentPage}`); 
+        // console.log(`perPage: ${perPage}`); 
+        // console.log(`skip: ${skip}`); 
 
 
         this.query = this.query.limit(perPage).skip(skip);

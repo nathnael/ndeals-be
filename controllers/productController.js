@@ -46,19 +46,21 @@ exports.getProducts = catchAsyncErrors (async (req, res, next) => {
 
 // Get single product details   =>   /api/v1/product/:id
 exports.getSingleProduct = catchAsyncErrors (async (req, res, next) => {
-    const product = await Product.findById(req.params.id);
-    if(!product) {
+    // console.log("**************** req.params.id: " + req.params.id);
+
+    const productDetails = await Product.findById(req.params.id);
+    if(!productDetails) {
         return next(new ErrorHandler('Product not found', 404));
     }
 
     // console.log("**************** Product: " + product.category.map(cat => cat.name));
 
-    const query = { 'category.name':  { $in: product.category.map(cat => cat.name) } };
+    const query = { 'category.name':  { $in: productDetails.category.map(cat => cat.name) } };
     const relatedProducts = await Product.find(query);
 
     res.status(200).json({
         success: true,
-        product,
+        productDetails,
         relatedProducts
     })
 });

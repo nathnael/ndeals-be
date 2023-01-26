@@ -114,10 +114,10 @@ function () {
       var currentPage = Number(this.queryStr.page) || 1;
       var perPage = Number(this.queryStr.perPage) || 12;
       var skip = perPage * (currentPage - 1);
-      skip = this.productsCount && skip >= this.productsCount ? 0 : skip;
-      console.log("currentPage: ".concat(currentPage));
-      console.log("perPage: ".concat(perPage));
-      console.log("skip: ".concat(skip));
+      skip = this.productsCount && skip >= this.productsCount ? 0 : skip; // console.log(`currentPage: ${currentPage}`); 
+      // console.log(`perPage: ${perPage}`); 
+      // console.log(`skip: ${skip}`); 
+
       this.query = this.query.limit(perPage).skip(skip);
       return this;
     }
