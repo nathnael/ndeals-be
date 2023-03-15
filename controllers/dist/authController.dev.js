@@ -246,10 +246,7 @@ exports.getUserprofile = catchAsyncErrors(function _callee5(req, res, next) {
 
         case 2:
           user = _context5.sent;
-          res.status(200).json({
-            success: true,
-            user: user
-          });
+          sendToken(user, 200, res);
 
         case 4:
         case "end":
