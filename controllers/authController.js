@@ -1,3 +1,6 @@
+const axios = require('axios');
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client();
 const User = require('../models/user');
 
 const ErrorHandler = require('../utils/errorHandler');
@@ -7,6 +10,19 @@ const sendEmail = require('../utils/sendEmail');
 
 const crypto = require('crypto');
 const cloudinary = require('cloudinary');
+
+async function verify() {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        // Or, if multiple clients access the backend:
+        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+    // If request specified a G Suite domain:
+    // const domain = payload['hd'];
+}
 
 // Register a user   =>   /api/v1/register
 exports.registerUser = catchAsyncErrors(async(req, res, next) => {
@@ -59,6 +75,55 @@ exports.loginUser = catchAsyncErrors( async (req, res, next) => {
 
     sendToken(user, 200, res);
 })
+
+exports.googleLoginUser = catchAsyncErrors( async (req, res, next) => {
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: req.body.credential,
+            audience: req.body.clientId,  
+        });
+        const payload = ticket.getPayload();
+        const userid = payload['sub'];
+
+        // console.log('User Details:', payload);
+
+        // Check if the email is verified
+        if(payload.email_verified) {
+            // Login user if the email is already registered on Ndeals
+            const user = await User.findOne({ email: payload.email }).select('+password');
+            if(user) {
+                return sendToken(user, 200, res);
+            } 
+            // If not registered, register user on Ndeals and login user
+            else {
+                const result = await cloudinary.v2.uploader.upload(payload.picture, {
+                    folder: 'avatars',
+                    width: 150,
+                    crop: 'scale'
+                });
+
+                const user = await User.create({
+                    name: payload.name,
+                    email: payload.email,
+                    password: payload.sub,
+                    avatar: {
+                        public_id: result.public_id,
+                        url: result.secure_url
+                    }
+                    
+                });
+
+                return sendToken(user, 200, res);
+            }
+        }
+
+        res.status(500).json({ message: 'Authentication failed' });
+
+    } catch (error) {
+        // console.error('Error saving code:', error);
+        res.status(500).json({ message: 'Failed to save code' });
+    }
+});
 
 // Forgot Password   =>    /api/v1/password/forgot
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {

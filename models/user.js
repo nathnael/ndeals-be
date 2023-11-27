@@ -42,7 +42,9 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     },
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
+    googleId: String,
+    secret: String
 });
 
 userSchema.plugin(uniqueValidator);
