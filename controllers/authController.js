@@ -83,7 +83,7 @@ exports.googleLoginUser = catchAsyncErrors( async (req, res, next) => {
             audience: req.body.clientId,  
         });
         const payload = ticket.getPayload();
-        const userid = payload['sub'];
+        // const userGoogleId = payload['sub'];
 
         // console.log('User Details:', payload);
 
@@ -106,6 +106,7 @@ exports.googleLoginUser = catchAsyncErrors( async (req, res, next) => {
                     name: payload.name,
                     email: payload.email,
                     password: payload.sub,
+                    googleId: payload.sub,
                     avatar: {
                         public_id: result.public_id,
                         url: result.secure_url
@@ -117,7 +118,52 @@ exports.googleLoginUser = catchAsyncErrors( async (req, res, next) => {
             }
         }
 
-        res.status(500).json({ message: 'Authentication failed' });
+        res.status(500).json({ message: 'Google authentication failed' });
+
+    } catch (error) {
+        // console.error('Error saving code:', error);
+        res.status(500).json({ message: 'Failed to save code' });
+    }
+});
+
+exports.facebookLoginUser = catchAsyncErrors( async (req, res, next) => {
+    try {
+        // Verify the accessToken returned by the frontend
+
+        // const ticket = await client.verifyIdToken({
+        //     idToken: req.body.credential,
+        //     audience: req.body.clientId,  
+        // });
+        // const payload = ticket.getPayload();
+
+        // console.log('FB User Details:', req.body);
+
+        // Check if the email is verified
+        if(req.body.accessToken) {
+            // Login user if the email is already registered on Ndeals
+            const user = await User.findOne({ email: req.body.email }).select('+password');
+
+            console.log('DB User:', user);
+            console.log('User picture:', req.body.picture.data.url);
+
+            if(user) {
+                return sendToken(user, 200, res);
+            } 
+            // If not registered, register user on Ndeals and login user
+            else {
+                const user = await User.create({
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: req.body.userID
+                });
+
+                console.log('FB User:', user);
+
+                return sendToken(user, 200, res);
+            }
+        }
+
+        res.status(500).json({ message: 'Facebook authentication failed' });
 
     } catch (error) {
         // console.error('Error saving code:', error);
