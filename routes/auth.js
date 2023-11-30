@@ -14,7 +14,8 @@ const {
     getUserDetails,
     updateUser,
     deleteUser,
-    googleLoginUser
+    googleLoginUser,
+    facebookLoginUser
 } = require('../controllers/authController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -22,6 +23,7 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 router.route('/register').post(registerUser);
 router.route('/login').post(loginUser);
 router.route('/googleLogin').post(googleLoginUser);
+router.route('/facebookLogin').post(facebookLoginUser);
 router.route('/logout').get(logout);
 router.route('/password/forgot').post(forgotPassword);
 router.route('/password/reset/:token').put(resetPassword);
